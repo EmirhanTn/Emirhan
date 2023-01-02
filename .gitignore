@@ -1,129 +1,95 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+import tkinter as tk
+from tkinter import *
+from tkinter import filedialog
+import pygame
 
-# C extensions
-*.so
+root = tk.Tk()
+root.title("Music Player")
+root.geometry('500x500')
+root.config(bg='white')
+pygame.mixer.init()
+muzik_liste = tk.Listbox(root, width=60, bg='black', fg='white')
+muzik_liste.pack(pady=20)
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+def muzik_ekle():
+    muzikler = filedialog.askopenfilenames(
+        initialdir='C:/Users/emirh/Desktop/Yeni klasör', title='Müzik Ekle',
+        filetypes=(('mp3 files', '*.mp3'),))
+    for muzik in muzikler:
+        muzikler = muzik.replace('C:/Users/emirh/Desktop/Yeni klasör/', '')
+        muzik_liste.insert(END, muzikler)
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
+def muzik_oynat():
+    muzik = muzik_liste.get(ACTIVE)
+    muzik = f'C:/Users/emirh/Desktop/Yeni klasör/{muzik}'
+    pygame.mixer.music.load(muzik)
+    pygame.mixer.music.play(loops=0)
 
-# Translations
-*.mo
-*.pot
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+def muzik_durdur():
+    pygame.mixer.music.stop()
+    muzik_liste.select_clear(ACTIVE)
 
-# Flask stuff:
-instance/
-.webassets-cache
 
-# Scrapy stuff:
-.scrapy
+global paused
+paused = False
 
-# Sphinx documentation
-docs/_build/
 
-# PyBuilder
-target/
+def muzik_duraklat():
+    global paused
+    if paused:
+        pygame.mixer.music.unpause()
+        paused = False
+    else:
+        pygame.mixer.music.pause()
+        paused = True
 
-# Jupyter Notebook
-.ipynb_checkpoints
 
-# IPython
-profile_default/
-ipython_config.py
+def muzik_sonraki():
+    muzik_sonraki = muzik_liste.curselection()
+    muzik_sonraki = muzik_sonraki[0]+1
+    muzik = muzik_liste.get(muzik_sonraki)
+    muzik = f'C:/Users/emirh/Desktop/Yeni klasör/{muzik}'
+    pygame.mixer.music.load(muzik)
+    pygame.mixer.music.play(loops=0)
+    muzik_liste.selection_clear(0, END)
+    muzik_liste.selection_set(muzik_sonraki, Last=None)
 
-# pyenv
-.python-version
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
+def muzik_onceki():
+    muzik_sonraki = muzik_liste.curselection()
+    muzik_sonraki = muzik_sonraki[0]-1
+    muzik = muzik_liste.get(muzik_sonraki)
+    muzik = f'C:/Users/emirh/Desktop/Yeni klasör/{muzik}'
+    pygame.mixer.music.load(muzik)
+    pygame.mixer.music.play(loops=0)
+    muzik_liste.selection_clear(0, END)
+    muzik_liste.selection_set(muzik_sonraki, Last=None)
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow
-__pypackages__/
 
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
+frame = tk.Frame(root, bg='white')
+frame.pack()
+başla_button = tk.Button(frame, text='Başlat', padx=10,
+                         pady=10, command=muzik_oynat)
+durdur_button = tk.Button(frame, text='Durdur', padx=10,
+                          pady=10, command=muzik_duraklat)
+duraklat_button = tk.Button(frame, text='Duraklat', padx=10,
+                            pady=10, command=muzik_durdur)
+sonraki_button = tk.Button(frame, text='Sonraki', padx=10,
+                           pady=10, command=muzik_sonraki)
+önceki_button = tk.Button(frame, text='Önceki',
+                          padx=10, pady=10, command=muzik_onceki)
 
-# SageMath parsed files
-*.sage.py
+başla_button.pack(side=LEFT, padx=5)
+durdur_button.pack(side=LEFT, padx=5)
+duraklat_button.pack(side=LEFT, padx=5)
+sonraki_button.pack(side=LEFT, padx=5)
+önceki_button.pack(side=LEFT, padx=5)
 
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+muzik_ekle_btn = tk.Button(root, text='Müzik Ekle',
+                           padx=10, pady=3, command=muzik_ekle)
+muzik_ekle_btn.pack(pady=20)
 
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
+root.mainloop()
